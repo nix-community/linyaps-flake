@@ -48,6 +48,9 @@
                 users = {
                   groups.deepin-linglong = { };
                   users.deepin-linglong = {
+                    description = "Linglong daemon user";
+                    home = "/var/lib/linglong";
+                    createHome = false;
                     group = "deepin-linglong";
                     isSystemUser = true;
                   };

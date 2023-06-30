@@ -89,6 +89,10 @@ stdenv.mkDerivation rec {
         --replace "/usr/bin/ll-box" "${linglong-box}/bin/ll-box" \
         --replace "/usr/bin/ll-dbus-proxy" "${linglong-dbus-proxy}/bin/ll-dbus-proxy"
     done
+
+    for file in $(grep -rl "/usr/libexec/linglong-loader"); do
+      substituteInPlace $file --replace "/usr/libexec/linglong-loader" "$out/libexec/linglong-loader"
+    done
   '';
 
   cmakeFlags = [

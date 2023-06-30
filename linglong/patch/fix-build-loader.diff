@@ -1,0 +1,60 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 1872a8a..e6e1699 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -1,5 +1,5 @@
+ set(BUILD_SHARED_LIBS OFF)
+-set(CMAKE_EXE_LINKER_FLAGS "-static")
++#set(CMAKE_EXE_LINKER_FLAGS "-static")
+ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_FILE_OFFSET_BITS=64")
+ 
+ set(EXENAME "linglong-loader")
+@@ -8,29 +8,38 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+ 
+ add_executable(${EXENAME} elf.cpp erofs.cpp main.cpp)
+ 
+-link_libraries("-static")
++#link_libraries("-static")
+ 
+ target_include_directories(${EXENAME} PRIVATE)
+ 
+ find_package(PkgConfig REQUIRED)
+ 
+ pkg_check_modules(SELINUX REQUIRED libselinux)
++pkg_check_modules(zstd REQUIRED IMPORTED_TARGET libzstd)
++pkg_check_modules(zlib REQUIRED IMPORTED_TARGET zlib)
++pkg_check_modules(fuse REQUIRED IMPORTED_TARGET fuse)
++pkg_check_modules(lz4 REQUIRED IMPORTED_TARGET liblz4)
++pkg_check_modules(lzma REQUIRED IMPORTED_TARGET liblzma)
++pkg_check_modules(lzo2 REQUIRED IMPORTED_TARGET lzo2)
++
++set(THREADS_PREFER_PTHREAD_FLAG TRUE)
++find_package(Threads REQUIRED)
+ 
+ set(LINK_LIBS
+     ${SELINUX_STATIC_LIBRARIES}
+-    pthread
++    PkgConfig::zstd
++    PkgConfig::zlib
++    PkgConfig::fuse
++    PkgConfig::lz4
++    PkgConfig::lzma
++    PkgConfig::lzo2
++    Threads::Threads
+     erofs
+-    erofsfuse
+-    lz4
+-    lzma
+-    lzo2
+-    z
+-    fuse
++     erofsfuse
+     stdc++
+-    zstd
+     dl)
+ 
+-target_link_libraries(${EXENAME} erofsfuse ${LINK_LIBS})
++target_link_libraries(${EXENAME} ${LINK_LIBS})
+ 
+ install(TARGETS linglong-loader
+         RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/libexec)
