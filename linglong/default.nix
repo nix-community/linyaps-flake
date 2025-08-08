@@ -24,7 +24,7 @@
 
 stdenv.mkDerivation rec {
   pname = "linyaps";
-  version = "1.9.0";
+  version = "1.9.8";
 
   src = fetchFromGitHub {
     owner = "OpenAtom-Linyaps";
