@@ -9,19 +9,37 @@
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachSystem [ "x86_64-linux" ]
       (system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          
+          linyaps-box = pkgs.callPackage (self.outPath + "/linglong/linyaps-box.nix") { };
+          
+          linyaps = pkgs.callPackage (self.outPath + "/linglong") {
+            inherit linyaps-box;
+            bash = pkgs.bash;
+            binutils = pkgs.binutils;
+            coreutils = pkgs.coreutils;
+            desktop-file-utils = pkgs.desktop-file-utils;
+            erofs-utils = pkgs.erofs-utils;
+            fuse3 = pkgs.fuse3;
+            fuse-overlayfs = pkgs.fuse-overlayfs;
+            gnutar = pkgs.gnutar;
+            glib = pkgs.glib;
+            shared-mime-info = pkgs.shared-mime-info;
+          };
+        in
         {
-          packages = flake-utils.lib.flattenTree (
-            import ./. { pkgs = nixpkgs.legacyPackages.${system}; }
-          );
+          packages = {
+            inherit linyaps-box linyaps;
+          };
 
           nixosModules = { config, lib, ... }:
             with lib;
-            with self.packages.${system};
-            let cfg = config.services.linglong; in
+            let cfg = config.services.linyaps; in
             {
               options = {
-                services.linglong = {
-                  enable = mkEnableOption "linglong" // {
+                services.linyaps = {
+                  enable = mkEnableOption "linyaps" // {
                     default = true;
                   };
                 };
@@ -29,17 +47,17 @@
 
               config = mkIf cfg.enable {
                 environment = {
-                  profiles = [ "${linglong}/etc/profile.d" ];
+                  profiles = [ "${linyaps}/etc/profile.d" ];
                   sessionVariables.LINGLONG_ROOT = "/var/lib/linglong";
-                  systemPackages = [ linglong ];
+                  systemPackages = [ linyaps ];
                 };
 
-                services.dbus.packages = [ linglong ];
+                services.dbus.packages = [ linyaps ];
 
                 systemd = {
-                  packages = [ linglong ];
+                  packages = [ linyaps ];
                   tmpfiles.rules = [
-                    "C /var/lib/linglong 0775 deepin-linglong deepin-linglong - ${linglong-root}"
+                    "C /var/lib/linglong 0775 deepin-linglong deepin-linglong - ${linyaps}"
                     "Z /var/lib/linglong 0775 deepin-linglong deepin-linglong - -"
                     "d /var/log/linglong 0757 root root - -"
                   ];
