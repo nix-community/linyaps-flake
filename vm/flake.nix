@@ -9,35 +9,28 @@
     nixosConfigurations.vm = nixpkgs.lib.nixosSystem {
       inherit system;
       modules = [
-        linglong-flake.nixosModules.${system}
+        linglong-flake.nixosModules.linyaps
 
         {
         imports = [ "${nixpkgs}/nixos/modules/virtualisation/qemu-vm.nix" ];
         environment.systemPackages = with pkgs; [
-          htop
-          neovim
           gdb
-          gnome.dconf-editor
-          dfeet
           binutils
-          fd
-          ripgrep
-          ranger
-          exa
         ];
 
-        services.linglong.enable = true;
+        services.linyaps.enable = true;
         
         services.xserver = {
           enable = true;
           displayManager = {
             lightdm.enable = true;
-            autoLogin = {
-              enable = true;
-              user = "test";
-            };
           };
           desktopManager.lxqt.enable = true;
+        };
+
+        services.displayManager.autoLogin = {
+          enable = true;
+          user = "test";
         };
 
         time.timeZone = "Asia/Shanghai";
