@@ -12,20 +12,10 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           
-          linyaps-box = pkgs.callPackage (self.outPath + "/linglong/linyaps-box.nix") { };
+          linyaps-box = pkgs.callPackage (self.outPath + "/pkgs/linyaps-box.nix") { };
           
-          linyaps = pkgs.callPackage (self.outPath + "/linglong") {
+          linyaps = pkgs.callPackage (self.outPath + "/pkgs") {
             inherit linyaps-box;
-            bash = pkgs.bash;
-            binutils = pkgs.binutils;
-            coreutils = pkgs.coreutils;
-            desktop-file-utils = pkgs.desktop-file-utils;
-            erofs-utils = pkgs.erofs-utils;
-            fuse3 = pkgs.fuse3;
-            fuse-overlayfs = pkgs.fuse-overlayfs;
-            gnutar = pkgs.gnutar;
-            glib = pkgs.glib;
-            shared-mime-info = pkgs.shared-mime-info;
           };
         in
         {
@@ -49,7 +39,10 @@
                 environment = {
                   profiles = [ "${linyaps}/etc/profile.d" ];
                   sessionVariables.LINGLONG_ROOT = "/var/lib/linglong";
-                  systemPackages = [ linyaps ];
+                  systemPackages = [ 
+                    linyaps
+                    linyaps-bos
+                  ];
                 };
 
                 services.dbus.packages = [ linyaps ];
