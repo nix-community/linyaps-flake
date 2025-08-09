@@ -56,6 +56,10 @@
                         source = "${linyaps}/etc/X11/Xsession.d/21linglong";
                         mode = "0644";
                       };
+                      "tmpfiles.d/linglong.conf" = {
+                        source = "${linyaps}/lib/tmpfiles.d/linglong.conf";
+                        mode = "0644";
+                      };
                     };
                   };
 
