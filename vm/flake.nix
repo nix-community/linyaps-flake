@@ -20,6 +20,16 @@
 
         services.linyaps.enable = true;
         
+        # 启用SSH服务
+        services.openssh = {
+          enable = true;
+          settings = {
+            PermitRootLogin = "yes";
+            PasswordAuthentication = true;
+            X11Forwarding = true;
+          };
+        };
+        
         services.xserver = {
           enable = true;
           displayManager = {

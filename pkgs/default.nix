@@ -38,11 +38,6 @@
   shared-mime-info,
 }:
 
-let
-  erofs-utils' = erofs-utils.override {
-    fuse = fuse3;
-  };
-in
 stdenv.mkDerivation (finalAttrs: {
   pname = "linyaps";
   version = "1.9.8";
@@ -61,8 +56,8 @@ stdenv.mkDerivation (finalAttrs: {
       bash = lib.getExe bash;
       cp = lib.getExe' coreutils "cp";
       sh = lib.getExe' bash "sh";
-      mkfs_erofs = lib.getExe' erofs-utils' "mkfs.erofs";
-      erofsfuse = lib.getExe' erofs-utils' "erofsfuse";
+      mkfs_erofs = lib.getExe' erofs-utils "mkfs.erofs";
+      erofsfuse = lib.getExe' erofs-utils "erofsfuse";
       fusermount = lib.getExe' fuse3 "fusermount3";
       tar = lib.getExe gnutar;
       objcopy = lib.getExe' binutils "objcopy";
