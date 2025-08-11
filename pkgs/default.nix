@@ -36,6 +36,7 @@
   gnutar,
   glib,
   shared-mime-info,
+  debug ? false,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -71,7 +72,15 @@ stdenv.mkDerivation (finalAttrs: {
 
   cmakeFlags = [
     (lib.cmakeFeature "LINGLONG_DEFAULT_OCI_RUNTIME" (lib.getExe linyaps-box))
+  ] ++ lib.optionals debug [
+    "-DCMAKE_BUILD_TYPE=Debug"
+    "-DCMAKE_CXX_FLAGS_DEBUG=-g -O0"
+    "-DCMAKE_C_FLAGS_DEBUG=-g -O0"
   ];
+
+  # 为 debug 版本添加额外的构建选项
+  dontStrip = debug;
+  separateDebugInfo = !debug;
 
   # postPatch = ''
   #   substituteInPlace apps/dumb-init/CMakeLists.txt \

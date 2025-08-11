@@ -12,15 +12,29 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           
-          linyaps-box = pkgs.callPackage (self.outPath + "/pkgs/linyaps-box.nix") { };
+          # 添加 debug 配置选项
+          debug = false;
+          
+          linyaps-box = pkgs.callPackage (self.outPath + "/pkgs/linyaps-box.nix") { 
+            inherit debug;
+          };
           
           linyaps = pkgs.callPackage (self.outPath + "/pkgs") {
-            inherit linyaps-box;
+            inherit linyaps-box debug;
           };
         in
         {
           packages = {
             inherit linyaps-box linyaps;
+            
+            # 添加 debug 版本的包
+            linyaps-box-debug = pkgs.callPackage (self.outPath + "/pkgs/linyaps-box.nix") { 
+              debug = true;
+            };
+            linyaps-debug = pkgs.callPackage (self.outPath + "/pkgs") {
+              linyaps-box = self.packages.${system}.linyaps-box-debug;
+              debug = true;
+            };
           };
         }) // {
           nixosModules = {
@@ -28,14 +42,30 @@
               with lib;
               let 
                 cfg = config.services.linyaps;
-                linyaps-box = self.packages.${pkgs.system}.linyaps-box;
-                linyaps = self.packages.${pkgs.system}.linyaps;
+                # 支持 debug 配置选项
+                debug = cfg.debug or true; # 默认开启 debug
+                linyaps-box = if debug then 
+                  self.packages.${pkgs.system}.linyaps-box 
+                else 
+                  pkgs.callPackage (self.outPath + "/pkgs/linyaps-box.nix") { debug = false; };
+                linyaps = if debug then 
+                  self.packages.${pkgs.system}.linyaps 
+                else 
+                  pkgs.callPackage (self.outPath + "/pkgs") { 
+                    linyaps-box = linyaps-box; 
+                    debug = false; 
+                  };
               in
               {
                 options = {
                   services.linyaps = {
                     enable = mkEnableOption "linyaps" // {
                       default = true;
+                    };
+                    debug = mkOption {
+                      type = types.bool;
+                      default = true;
+                      description = "是否启用 debug 版本（包含调试信息和符号表）";
                     };
                   };
                 };

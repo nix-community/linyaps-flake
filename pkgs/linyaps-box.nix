@@ -8,6 +8,7 @@
 , libcap
 , libseccomp
 , nlohmann_json
+, debug ? false
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -36,7 +37,15 @@ stdenv.mkDerivation (finalAttrs: {
 
   cmakeFlags = [
     "-Dlinyaps-box_ENABLE_SECCOMP=ON"
+  ] ++ lib.optionals debug [
+    "-DCMAKE_BUILD_TYPE=Debug"
+    "-DCMAKE_CXX_FLAGS_DEBUG=-g -O0"
+    "-DCMAKE_C_FLAGS_DEBUG=-g -O0"
   ];
+
+  # 为 debug 版本添加额外的构建选项
+  dontStrip = debug;
+  separateDebugInfo = !debug;
 
   meta = {
     description = "Simple OCI runtime mainly used by linyaps";
