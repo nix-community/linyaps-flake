@@ -1,40 +1,40 @@
-{ fetchFromGitHub
-, fetchpatch
-, lib
-, stdenv
-, cmake
-, copyDesktopItems
-, pkg-config
-, qt6Packages
-, linyaps-box
-, cli11
-, curl
-, gpgme
-, gtest
-, libarchive
-, libelf
-, libsodium
-, libsysprof-capture
-, nlohmann_json
-, openssl
-, ostree
-, systemdLibs
-, tl-expected
-, uncrustify
-, xz
-, yaml-cpp
-, replaceVars
-, bash
-, binutils
-, coreutils
-, desktop-file-utils
-, erofs-utils
-, fuse3
-, fuse-overlayfs
-, gnutar
-, glib
-, shared-mime-info
-,
+{
+  fetchFromGitHub,
+  fetchpatch,
+  lib,
+  stdenv,
+  cmake,
+  copyDesktopItems,
+  pkg-config,
+  qt6Packages,
+  linyaps-box,
+  cli11,
+  curl,
+  gpgme,
+  gtest,
+  libarchive,
+  libelf,
+  libsodium,
+  libsysprof-capture,
+  nlohmann_json,
+  openssl,
+  ostree,
+  systemdLibs,
+  tl-expected,
+  uncrustify,
+  xz,
+  yaml-cpp,
+  replaceVars,
+  bash,
+  binutils,
+  coreutils,
+  desktop-file-utils,
+  erofs-utils,
+  fuse3,
+  fuse-overlayfs,
+  gnutar,
+  glib,
+  shared-mime-info,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -56,15 +56,11 @@ stdenv.mkDerivation (finalAttrs: {
     })
   ];
 
-  cmakeFlags = [
-    (lib.cmakeFeature "LINGLONG_DEFAULT_OCI_RUNTIME" (lib.getExe linyaps-box))
-  ];
-
   postPatch = ''
     substituteInPlace apps/dumb-init/CMakeLists.txt \
       --replace-fail "target_link_options(\''${DUMB_INIT_TARGET} PRIVATE -static)" \
                      "target_link_options(\''${DUMB_INIT_TARGET} PRIVATE -static -L${stdenv.cc.libc.static}/lib)"
-    
+
     substituteInPlace misc/share/applications/linyaps.desktop \
       --replace-fail "/usr/bin/ll-cli" "$out/bin/ll-cli"
   '';
@@ -101,18 +97,21 @@ stdenv.mkDerivation (finalAttrs: {
 
   # 为所有被包装的二进制添加运行时依赖到 PATH
   qtWrapperArgs = [
-    "--prefix PATH : ${lib.makeBinPath [
-      bash
-      binutils
-      coreutils
-      desktop-file-utils
-      erofs-utils
-      fuse3
-      fuse-overlayfs
-      glib
-      gnutar
-      shared-mime-info
-    ]}"
+    "--prefix PATH : ${
+      lib.makeBinPath [
+        bash
+        binutils
+        coreutils
+        desktop-file-utils
+        erofs-utils
+        fuse3
+        fuse-overlayfs
+        glib
+        gnutar
+        shared-mime-info
+        linyaps-box
+      ]
+    }"
   ];
 
   # 手动包装需要的二进制文件，跳过 dumb-init

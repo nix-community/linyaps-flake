@@ -1,13 +1,14 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, pkg-config
-, cli11
-, gtest
-, libcap
-, libseccomp
-, nlohmann_json
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  pkg-config,
+  cli11,
+  gtest,
+  libcap,
+  libseccomp,
+  nlohmann_json,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -46,4 +47,4 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "ll-box";
     maintainers = with lib.maintainers; [ rewine ];
   };
-}) 
+})
