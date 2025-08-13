@@ -23,7 +23,7 @@ nix build .#linyaps
 
 ### 2. Use in NixOS
 
-在您的 `flake.nix` 中添加：
+Include the nixos module in your configuration：
 
 ```nix
 {
