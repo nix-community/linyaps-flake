@@ -41,9 +41,9 @@ stdenv.mkDerivation (finalAttrs: {
   meta = {
     description = "Simple OCI runtime mainly used by linyaps";
     homepage = "https://github.com/OpenAtom-Linyaps/linyaps-box";
-    mainProgram = "ll-box";
-    platforms = lib.platforms.linux;
     license = lib.licenses.lgpl3Plus;
+    platforms = lib.platforms.linux;
+    mainProgram = "ll-box";
     maintainers = with lib.maintainers; [ rewine ];
   };
 }) 

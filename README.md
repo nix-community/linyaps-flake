@@ -11,14 +11,6 @@
 - 共享运行时库，减少磁盘占用
 - 支持 OCI 容器标准
 
-## 项目特性
-
-- 🚀 **跨平台兼容**: 支持多种 Linux 发行版
-- 🔒 **沙盒安全**: 应用运行在隔离环境中
-- 📦 **包管理**: 完整的包管理功能
-- 🛠️ **开发友好**: 支持 Debug 和 Release 构建模式
-- 🎯 **NixOS 集成**: 提供 NixOS 模块支持
-
 ## 快速开始
 
 ### 1. 构建包
@@ -34,10 +26,7 @@ nix build .#linyaps
 在您的 `configuration.nix` 或 `flake.nix` 中：
 
 ```nix
-services.linyaps = {
-  enable = true;
-  debug = false; # 默认 Release 模式，设为 true 使用 Debug 版本
-};
+services.linyaps.enable = true;
 ```
 
 ## 项目结构
@@ -55,13 +44,6 @@ services.linyaps = {
 
 - **linyaps-box**: 简单的 OCI 运行时，主要用于 linyaps
 - **linyaps**: 主要的包管理器，提供完整的玲珑容器功能
-
-## 使用场景
-
-- 🏠 **家庭用户**: 在不同发行版间迁移应用
-- 👨‍💻 **开发者**: 开发和测试跨平台应用
-- 🏢 **企业环境**: 标准化应用部署
-- 🧪 **测试环境**: 应用兼容性测试
 
 ## 相关链接
 

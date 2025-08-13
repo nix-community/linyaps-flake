@@ -1,42 +1,40 @@
-{
-  fetchFromGitHub,
-  fetchpatch,
-  lib,
-  stdenv,
-  cmake,
-  copyDesktopItems,
-  pkg-config,
-  qt6Packages,
-  linyaps-box,
-
-  cli11,
-  curl,
-  gpgme,
-  gtest,
-  libarchive,
-  libelf,
-  libsodium,
-  libsysprof-capture,
-  nlohmann_json,
-  openssl,
-  ostree,
-  systemdLibs,
-  tl-expected,
-  uncrustify,
-  xz,
-  yaml-cpp,
-
-  replaceVars,
-  bash,
-  binutils,
-  coreutils,
-  desktop-file-utils,
-  erofs-utils,
-  fuse3,
-  fuse-overlayfs,
-  gnutar,
-  glib,
-  shared-mime-info,
+{ fetchFromGitHub
+, fetchpatch
+, lib
+, stdenv
+, cmake
+, copyDesktopItems
+, pkg-config
+, qt6Packages
+, linyaps-box
+, cli11
+, curl
+, gpgme
+, gtest
+, libarchive
+, libelf
+, libsodium
+, libsysprof-capture
+, nlohmann_json
+, openssl
+, ostree
+, systemdLibs
+, tl-expected
+, uncrustify
+, xz
+, yaml-cpp
+, replaceVars
+, bash
+, binutils
+, coreutils
+, desktop-file-utils
+, erofs-utils
+, fuse3
+, fuse-overlayfs
+, gnutar
+, glib
+, shared-mime-info
+,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -55,21 +53,6 @@ stdenv.mkDerivation (finalAttrs: {
       name = "use-CMAKE_INSTALL_SYSCONFDIR-for-config-paths.patch";
       url = "https://github.com/OpenAtom-Linyaps/linyaps/commit/b0a2a1d873e6416feb3ddea13800aa1eba62c2ff.patch";
       hash = "sha256-0VtMyatpr//xA9je4B/4ZBj46uzqLtzsDmJAyPTnPQ8=";
-    })
-    (replaceVars ./patch-binary-path.patch {
-      bash = lib.getExe bash;
-      cp = lib.getExe' coreutils "cp";
-      sh = lib.getExe' bash "sh";
-      mkfs_erofs = lib.getExe' erofs-utils "mkfs.erofs";
-      erofsfuse = lib.getExe' erofs-utils "erofsfuse";
-      fusermount = lib.getExe' fuse3 "fusermount3";
-      tar = lib.getExe gnutar;
-      objcopy = lib.getExe' binutils "objcopy";
-      ar = lib.getExe' binutils "ar";
-      update-desktop-database = lib.getExe' desktop-file-utils "update-desktop-database";
-      update-mime-database = lib.getExe' shared-mime-info "update-mime-database";
-      glib-compile-schemas = lib.getExe' glib "glib-compile-schemas";
-      fuse-overlayfs = lib.getExe fuse-overlayfs;
     })
   ];
 
@@ -115,6 +98,22 @@ stdenv.mkDerivation (finalAttrs: {
 
   # 禁用 Qt 包装
   dontWrapQtApps = true;
+
+  # 为所有被包装的二进制添加运行时依赖到 PATH
+  qtWrapperArgs = [
+    "--prefix PATH : ${lib.makeBinPath [
+      bash
+      binutils
+      coreutils
+      desktop-file-utils
+      erofs-utils
+      fuse3
+      fuse-overlayfs
+      glib
+      gnutar
+      shared-mime-info
+    ]}"
+  ];
 
   # 手动包装需要的二进制文件，跳过 dumb-init
   postFixup = ''
