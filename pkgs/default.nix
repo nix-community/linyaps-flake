@@ -54,6 +54,7 @@ stdenv.mkDerivation (finalAttrs: {
       url = "https://github.com/OpenAtom-Linyaps/linyaps/commit/b0a2a1d873e6416feb3ddea13800aa1eba62c2ff.patch";
       hash = "sha256-0VtMyatpr//xA9je4B/4ZBj46uzqLtzsDmJAyPTnPQ8=";
     })
+    ./fix-host-path.patch
   ];
 
   postPatch = ''

@@ -1,0 +1,67 @@
+diff --git a/libs/oci-cfg-generators/src/linglong/oci-cfg-generators/container_cfg_builder.cpp b/libs/oci-cfg-generators/src/linglong/oci-cfg-generators/container_cfg_builder.cpp
+index 4e05fcba..454da25d 100644
+--- a/libs/oci-cfg-generators/src/linglong/oci-cfg-generators/container_cfg_builder.cpp
++++ b/libs/oci-cfg-generators/src/linglong/oci-cfg-generators/container_cfg_builder.cpp
+@@ -19,6 +19,8 @@
+ #include <iomanip>
+ #include <iostream>
+ #include <vector>
++#include <unordered_map>
++#include <unordered_set>
+ 
+ #include <sys/stat.h>
+ #include <sys/types.h>
+@@ -382,19 +384,43 @@ ContainerCfgBuilder &ContainerCfgBuilder::bindHostRoot() noexcept
+ 
+ ContainerCfgBuilder &ContainerCfgBuilder::bindHostStatics() noexcept
+ {
+-    std::vector<std::filesystem::path> statics{
+-        "/etc/machine-id",
+-        // FIXME: support for host /etc/ssl, ref https://github.com/p11-glue/p11-kit
+-        "/usr/lib/locale",
+-        "/usr/share/fonts",
+-        "/usr/share/icons",
+-        "/usr/share/themes",
+-        "/var/cache/fontconfig",
++    std::unordered_map<std::filesystem::path, std::string> statics{
++        { "/etc/machine-id", "" },
++        { "/usr/lib/locale", "" },
++        { "/var/cache/fontconfig", "" },
++
++        { "/run/current-system/sw/share/X11/fonts", "/usr/share/fonts" },
++        { "/run/current-system/sw/share/icons", "/usr/share/icons" },
++        { "/run/current-system/sw/share/themes", "/usr/share/themes" },
+     };
+ 
+     hostStaticsMount = std::vector<Mount>{};
+-    for (const auto &loc : statics) {
+-        bindIfExist(*hostStaticsMount, loc);
++    auto nixStorePaths = std::unordered_set<std::string>{};
++    for (const auto &[source, destination] : statics) {
++        if (!std::filesystem::exists(source))
++            continue;
++
++        bindIfExist(*hostStaticsMount, source, destination);
++
++        std::string sourcePathPrefix = "/run/current-system/sw/share/";
++        std::string nixStorePrefix = "/nix/store/";
++
++        if (source.string().rfind(sourcePathPrefix, 0) != 0)
++            continue;
++
++        for (const std::filesystem::directory_entry &dir_entry :
++             std::filesystem::recursive_directory_iterator(source)) {
++            if (!dir_entry.is_symlink())
++                continue;
++
++            std::string target = std::filesystem::canonical(dir_entry.path());
++            if (target.rfind(nixStorePrefix, 0) != 0)
++                continue;
++            nixStorePaths.insert(target.substr(0, target.find('/', nixStorePrefix.length())));
++        }
++    }
++    for (const std::string &path : nixStorePaths) {
++        bindIfExist(*hostStaticsMount, path);
+     }
+ 
+     return *this;
