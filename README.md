@@ -23,10 +23,30 @@ nix build .#linyaps
 
 ### 2. 在 NixOS 中使用
 
-在您的 `configuration.nix` 或 `flake.nix` 中：
+在您的 `flake.nix` 中添加：
 
 ```nix
-services.linyaps.enable = true;
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    linglong-flake.url = "github:wineee/linglong-flake";
+  };
+
+  outputs = { self, nixpkgs, linglong-flake, ... }: {
+    nixosConfigurations = {
+      my-nixos = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./configuration.nix
+          linglong-flake.nixosModules.linyaps
+          {
+            services.linyaps.enable = true;
+          }
+        ];
+      };
+    };
+  };
+}
 ```
 
 ## 项目结构
