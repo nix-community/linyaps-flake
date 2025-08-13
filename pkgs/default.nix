@@ -92,10 +92,10 @@ stdenv.mkDerivation (finalAttrs: {
     qt6Packages.wrapQtAppsNoGuiHook
   ];
 
-  # 禁用 Qt 包装
+  # Disable automatic Qt wrapping to handle it manually
   dontWrapQtApps = true;
 
-  # 为所有被包装的二进制添加运行时依赖到 PATH
+  # Add runtime dependencies to PATH for all wrapped binaries
   qtWrapperArgs = [
     "--prefix PATH : ${
       lib.makeBinPath [
@@ -114,26 +114,20 @@ stdenv.mkDerivation (finalAttrs: {
     }"
   ];
 
-  # 手动包装需要的二进制文件，跳过 dumb-init
+  # Note: dumb-init must be statically linked and should not be wrapped
   postFixup = ''
-    # 包装 bin/ 目录下的可执行文件
-    for f in $out/bin/*; do
-      if [ -f "$f" ] && [ -x "$f" ]; then
-        wrapQtApp "$f"
-      fi
+    # Wrap all executables except dumb-init
+    find "$out" -type f -executable \
+      \( -path "$out/bin/*" -o -path "$out/libexec/*" \) \
+      ! -name "dumb-init" \
+      -print0 | while IFS= read -r -d "" f; do
+      wrapQtApp "$f"
     done
-
-    # 包装 libexec/ 目录下的可执行文件，但跳过 dumb-init
-    if [ -d "$out/libexec" ]; then
-      find "$out/libexec" -type f -executable ! -name "dumb-init" -print0 | while IFS= read -r -d "" f; do
-        wrapQtApp "$f"
-      done
-    fi
   '';
 
   meta = {
     description = "Cross-distribution package manager with sandboxed apps and shared runtime";
-    homepage = "https://linyaps.org.cn/";
+    homepage = "https://linyaps.org.cn";
     downloadPage = "https://github.com/OpenAtom-Linyaps/linyaps";
     changelog = "https://github.com/OpenAtom-Linyaps/linyaps/releases/tag/${finalAttrs.version}";
     license = lib.licenses.lgpl3Plus;
