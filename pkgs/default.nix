@@ -25,7 +25,6 @@
   yaml-cpp,
 
   replaceVars,
-  linyaps-box,
   bash,
   binutils,
   coreutils,
@@ -52,7 +51,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   patches = [
     ./fix-path.patch
-    ./disable-static-link.patch
     (replaceVars ./patch-binary-path.patch {
       bash = lib.getExe bash;
       cp = lib.getExe' coreutils "cp";
@@ -71,23 +69,20 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   cmakeFlags = [
-    (lib.cmakeFeature "LINGLONG_DEFAULT_OCI_RUNTIME" (lib.getExe linyaps-box))
+    # (lib.cmakeFeature "LINGLONG_DEFAULT_OCI_RUNTIME" (lib.getExe linyaps-box))
   ] ++ lib.optionals debug [
     "-DCMAKE_BUILD_TYPE=Debug"
-    "-DCMAKE_CXX_FLAGS_DEBUG=-g -O0"
-    "-DCMAKE_C_FLAGS_DEBUG=-g -O0"
   ];
 
   # 为 debug 版本添加额外的构建选项
   dontStrip = debug;
   separateDebugInfo = !debug;
 
-  # postPatch = ''
-  #   substituteInPlace apps/dumb-init/CMakeLists.txt \
-  #     --replace-fail "target_link_options(\''${DUMB_INIT_TARGET} PRIVATE -static)" \
-  #                    "target_link_options(\''${DUMB_INIT_TARGET} PRIVATE -static -L${stdenv.cc.libc.static}/lib -lc -lm)"
-  #   cat apps/dumb-init/CMakeLists.txt
-  # '';
+  postPatch = ''
+    substituteInPlace apps/dumb-init/CMakeLists.txt \
+      --replace-fail "target_link_options(\''${DUMB_INIT_TARGET} PRIVATE -static)" \
+                     "target_link_options(\''${DUMB_INIT_TARGET} PRIVATE -static -L${stdenv.cc.libc.static}/lib -lc -lm)"
+  '';
 
   buildInputs = [
     cli11
@@ -115,6 +110,26 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config
     qt6Packages.wrapQtAppsNoGuiHook
   ];
+
+  # 禁用 Qt 包装
+  dontWrapQtApps = true;
+
+  # 手动包装需要的二进制文件，跳过 dumb-init
+  postFixup = ''
+    # 包装 bin/ 目录下的可执行文件
+    for f in $out/bin/*; do
+      if [ -f "$f" ] && [ -x "$f" ]; then
+        wrapQtApp "$f"
+      fi
+    done
+
+    # 包装 libexec/ 目录下的可执行文件，但跳过 dumb-init
+    if [ -d "$out/libexec" ]; then
+      find "$out/libexec" -type f -executable ! -name "dumb-init" -print0 | while IFS= read -r -d "" f; do
+        wrapQtApp "$f"
+      done
+    fi
+  '';
 
   meta = {
     description = "Cross-distribution package manager with sandboxed apps and shared runtime";

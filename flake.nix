@@ -20,7 +20,7 @@
           };
           
           linyaps = pkgs.callPackage (self.outPath + "/pkgs") {
-            inherit linyaps-box debug;
+            inherit debug;
           };
         in
         {
@@ -32,7 +32,6 @@
               debug = true;
             };
             linyaps-debug = pkgs.callPackage (self.outPath + "/pkgs") {
-              linyaps-box = self.packages.${system}.linyaps-box-debug;
               debug = true;
             };
           };
@@ -52,7 +51,6 @@
                   self.packages.${pkgs.system}.linyaps 
                 else 
                   pkgs.callPackage (self.outPath + "/pkgs") { 
-                    linyaps-box = linyaps-box; 
                     debug = false; 
                   };
               in

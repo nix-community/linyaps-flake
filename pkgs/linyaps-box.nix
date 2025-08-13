@@ -39,8 +39,8 @@ stdenv.mkDerivation (finalAttrs: {
     "-Dlinyaps-box_ENABLE_SECCOMP=ON"
   ] ++ lib.optionals debug [
     "-DCMAKE_BUILD_TYPE=Debug"
-    "-DCMAKE_CXX_FLAGS_DEBUG=-g -O0"
-    "-DCMAKE_C_FLAGS_DEBUG=-g -O0"
+    "-Dlinyaps-box_DEFAULT_LOG_LEVEL=7"
+    "-Dlinyaps-box_ACTIVE_LOG_LEVEL=7"
   ];
 
   # 为 debug 版本添加额外的构建选项
