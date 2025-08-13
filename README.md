@@ -1,27 +1,27 @@
 # Linglong Flake
 
-一个用于部署玲珑（Linglong）容器的 Nix Flake 项目。
+A Nix Flake project for deploying Linglong containers.
 
-## 什么是玲珑容器？
+## What is Linglong?
 
-玲珑（Linglong）是一个跨发行版的包管理器，支持沙盒化应用和共享运行时。它允许您：
+Linglong is a cross-distribution package manager that supports sandboxed applications and shared runtime environments. It enables you to:
 
-- 在不同 Linux 发行版上运行相同的应用
-- 使用沙盒技术隔离应用环境
-- 共享运行时库，减少磁盘占用
-- 支持 OCI 容器标准
+- Run the same applications across different Linux distributions
+- Isolate application environments using sandbox technology
+- Share runtime libraries to reduce disk usage
+- Support OCI container standards
 
-## 快速开始
+## Quick Start
 
-### 1. 构建包
+### 1. Build Packages
 
 ```bash
-# 使用默认配置构建
+# Build with default configuration
 nix build .#linyaps-box
 nix build .#linyaps
 ```
 
-### 2. 在 NixOS 中使用
+### 2. Use in NixOS
 
 在您的 `flake.nix` 中添加：
 
@@ -49,36 +49,36 @@ nix build .#linyaps
 }
 ```
 
-## 项目结构
+## Project Structure
 
 ```
 .
-├── flake.nix              # 主配置文件
-├── pkgs/                  # 包定义
-│   ├── default.nix        # linyaps 包定义
-│   └── linyaps-box.nix    # linyaps-box 包定义
-└── README.md              # 本文件
+├── flake.nix              # Main configuration file
+├── pkgs/                  # Package definitions
+│   ├── default.nix        # linyaps package definition
+│   └── linyaps-box.nix    # linyaps-box package definition
+└── README.md              # This file
 ```
 
-## 依赖说明
+## Dependencies
 
-- **linyaps-box**: 简单的 OCI 运行时，主要用于 linyaps
-- **linyaps**: 主要的包管理器，提供完整的玲珑容器功能
+- **linyaps-box**: Simple OCI runtime, primarily used by linyaps
+- **linyaps**: Main package manager, providing complete Linglong container functionality
 
-## 相关链接
+## Related Links
 
-- [玲珑官网](https://linglong.org.cn/)
-- [GitHub 仓库](https://github.com/OpenAtom-Linyaps/linyaps)
-- [官方文档](https://linglong.org.cn/docs/)
+- [Linglong Website](https://linglong.org.cn/)
+- [GitHub Repository](https://github.com/OpenAtom-Linyaps/linyaps)
+- [Official Documentation](https://linglong.org.cn/docs/)
 
-## 贡献
+## Contributing
 
-欢迎提交 Issue 和 Pull Request！
+Issues and Pull Requests are welcome!
 
-## 许可证
+## License
 
-本项目采用 MIT 许可证。
+This project is licensed under the MIT License.
 
 ---
 
-参考了 [nur-packages](https://github.com/HHR2020/nur-packages) 项目。
+Inspired by [nur-packages](https://github.com/HHR2020/nur-packages) project.
