@@ -8,7 +8,6 @@
 , libcap
 , libseccomp
 , nlohmann_json
-, debug ? false
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -37,15 +36,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   cmakeFlags = [
     "-Dlinyaps-box_ENABLE_SECCOMP=ON"
-  ] ++ lib.optionals debug [
-    "-DCMAKE_BUILD_TYPE=Debug"
-    "-Dlinyaps-box_DEFAULT_LOG_LEVEL=7"
-    "-Dlinyaps-box_ACTIVE_LOG_LEVEL=7"
   ];
-
-  # 为 debug 版本添加额外的构建选项
-  dontStrip = debug;
-  separateDebugInfo = !debug;
 
   meta = {
     description = "Simple OCI runtime mainly used by linyaps";
@@ -53,5 +44,6 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "ll-box";
     platforms = lib.platforms.linux;
     license = lib.licenses.lgpl3Plus;
+    maintainers = with lib.maintainers; [ rewine ];
   };
 }) 

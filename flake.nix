@@ -21,15 +21,6 @@
         {
           packages = {
             inherit linyaps-box linyaps;
-            
-            # 添加 debug 版本的包
-            linyaps-box-debug = pkgs.callPackage (self.outPath + "/pkgs/linyaps-box.nix") { 
-              debug = true;
-            };
-            linyaps-debug = pkgs.callPackage (self.outPath + "/pkgs") {
-              debug = true;
-              linyaps-box = self.packages.${system}.linyaps-box-debug;
-            };
           };
         }) // {
           nixosModules = {
@@ -37,27 +28,14 @@
               with lib;
               let 
                 cfg = config.services.linyaps;
-                # 支持 debug 配置选项
-                debug = cfg.debug or true;
-                linyaps-box = if debug then 
-                  self.packages.${pkgs.system}.linyaps-box 
-                else 
-                  elf.packages.${pkgs.system}.linyaps-box-debug; 
-                linyaps = if debug then 
-                  self.packages.${pkgs.system}.linyaps 
-                else 
-                  self.packages.${pkgs.system}.linyaps-debug;
+                linyaps-box = self.packages.${pkgs.system}.linyaps-box;
+                linyaps = self.packages.${pkgs.system}.linyaps;
               in
               {
                 options = {
                   services.linyaps = {
                     enable = mkEnableOption "linyaps" // {
                       default = true;
-                    };
-                    debug = mkOption {
-                      type = types.bool;
-                      default = true;
-                      description = "是否启用 debug 版本（包含调试信息和符号表）";
                     };
                   };
                 };

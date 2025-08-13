@@ -24,27 +24,12 @@
 ### 1. 构建包
 
 ```bash
-# 构建所有包（默认 Release 模式）
-./build-debug.sh
-
-# 构建特定包
-./build-debug.sh linyaps-box
-./build-debug.sh linyaps
-```
-
-### 2. 手动构建
-
-```bash
 # 使用默认配置构建
 nix build .#linyaps-box
 nix build .#linyaps
-
-# 构建 Debug 版本
-nix build .#linyaps-box-debug
-nix build .#linyaps-debug
 ```
 
-### 3. 在 NixOS 中使用
+### 2. 在 NixOS 中使用
 
 在您的 `configuration.nix` 或 `flake.nix` 中：
 
@@ -55,18 +40,6 @@ services.linyaps = {
 };
 ```
 
-## 构建模式
-
-### Release 模式（默认）
-- 启用优化，性能更好
-- 文件大小更小
-- 适合生产环境使用
-
-### Debug 模式
-- 包含完整的调试信息
-- 适合开发和调试环境
-- 保留符号表
-
 ## 项目结构
 
 ```
@@ -75,8 +48,6 @@ services.linyaps = {
 ├── pkgs/                  # 包定义
 │   ├── default.nix        # linyaps 包定义
 │   └── linyaps-box.nix    # linyaps-box 包定义
-├── build-debug.sh         # 构建脚本
-├── example-configuration.nix  # NixOS 配置示例
 └── README.md              # 本文件
 ```
 

@@ -1,5 +1,6 @@
 {
   fetchFromGitHub,
+  fetchpatch,
   lib,
   stdenv,
   cmake,
@@ -36,7 +37,6 @@
   gnutar,
   glib,
   shared-mime-info,
-  debug ? false,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -51,7 +51,11 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   patches = [
-    ./fix-path.patch
+    (fetchpatch {
+      name = "use-CMAKE_INSTALL_SYSCONFDIR-for-config-paths.patch";
+      url = "https://github.com/OpenAtom-Linyaps/linyaps/commit/b0a2a1d873e6416feb3ddea13800aa1eba62c2ff.patch";
+      hash = "sha256-0VtMyatpr//xA9je4B/4ZBj46uzqLtzsDmJAyPTnPQ8=";
+    })
     (replaceVars ./patch-binary-path.patch {
       bash = lib.getExe bash;
       cp = lib.getExe' coreutils "cp";
@@ -71,18 +75,15 @@ stdenv.mkDerivation (finalAttrs: {
 
   cmakeFlags = [
     (lib.cmakeFeature "LINGLONG_DEFAULT_OCI_RUNTIME" (lib.getExe linyaps-box))
-  ] ++ lib.optionals debug [
-    "-DCMAKE_BUILD_TYPE=Debug"
   ];
-
-  # 为 debug 版本添加额外的构建选项
-  dontStrip = debug;
-  separateDebugInfo = !debug;
 
   postPatch = ''
     substituteInPlace apps/dumb-init/CMakeLists.txt \
       --replace-fail "target_link_options(\''${DUMB_INIT_TARGET} PRIVATE -static)" \
-                     "target_link_options(\''${DUMB_INIT_TARGET} PRIVATE -static -L${stdenv.cc.libc.static}/lib -lc -lm)"
+                     "target_link_options(\''${DUMB_INIT_TARGET} PRIVATE -static -L${stdenv.cc.libc.static}/lib)"
+    
+    substituteInPlace misc/share/applications/linyaps.desktop \
+      --replace-fail "/usr/bin/ll-cli" "$out/bin/ll-cli"
   '';
 
   buildInputs = [
@@ -103,7 +104,6 @@ stdenv.mkDerivation (finalAttrs: {
     uncrustify
     xz
     yaml-cpp
-    linyaps-box
   ];
 
   nativeBuildInputs = [
@@ -138,8 +138,9 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://linyaps.org.cn/";
     downloadPage = "https://github.com/OpenAtom-Linyaps/linyaps";
     changelog = "https://github.com/OpenAtom-Linyaps/linyaps/releases/tag/${finalAttrs.version}";
-    mainProgram = "ll-cli";
     license = lib.licenses.lgpl3Plus;
     platforms = lib.platforms.linux;
+    mainProgram = "ll-cli";
+    maintainers = with lib.maintainers; [ rewine ];
   };
 })
