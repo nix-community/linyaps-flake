@@ -6,6 +6,7 @@
   copyDesktopItems,
   pkg-config,
   qt6Packages,
+  linyaps-box,
 
   cli11,
   curl,
@@ -69,7 +70,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   cmakeFlags = [
-    # (lib.cmakeFeature "LINGLONG_DEFAULT_OCI_RUNTIME" (lib.getExe linyaps-box))
+    (lib.cmakeFeature "LINGLONG_DEFAULT_OCI_RUNTIME" (lib.getExe linyaps-box))
   ] ++ lib.optionals debug [
     "-DCMAKE_BUILD_TYPE=Debug"
   ];
@@ -102,6 +103,7 @@ stdenv.mkDerivation (finalAttrs: {
     uncrustify
     xz
     yaml-cpp
+    linyaps-box
   ];
 
   nativeBuildInputs = [

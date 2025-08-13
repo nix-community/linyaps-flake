@@ -12,15 +12,10 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           
-          # 添加 debug 配置选项
-          debug = false;
-          
-          linyaps-box = pkgs.callPackage (self.outPath + "/pkgs/linyaps-box.nix") { 
-            inherit debug;
-          };
+          linyaps-box = pkgs.callPackage (self.outPath + "/pkgs/linyaps-box.nix") { };
           
           linyaps = pkgs.callPackage (self.outPath + "/pkgs") {
-            inherit debug;
+            inherit linyaps-box;
           };
         in
         {
@@ -33,6 +28,7 @@
             };
             linyaps-debug = pkgs.callPackage (self.outPath + "/pkgs") {
               debug = true;
+              linyaps-box = self.packages.${system}.linyaps-box-debug;
             };
           };
         }) // {
@@ -42,17 +38,15 @@
               let 
                 cfg = config.services.linyaps;
                 # 支持 debug 配置选项
-                debug = cfg.debug or true; # 默认开启 debug
+                debug = cfg.debug or true;
                 linyaps-box = if debug then 
                   self.packages.${pkgs.system}.linyaps-box 
                 else 
-                  pkgs.callPackage (self.outPath + "/pkgs/linyaps-box.nix") { debug = false; };
+                  elf.packages.${pkgs.system}.linyaps-box-debug; 
                 linyaps = if debug then 
                   self.packages.${pkgs.system}.linyaps 
                 else 
-                  pkgs.callPackage (self.outPath + "/pkgs") { 
-                    debug = false; 
-                  };
+                  self.packages.${pkgs.system}.linyaps-debug;
               in
               {
                 options = {
