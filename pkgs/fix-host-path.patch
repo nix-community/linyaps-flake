@@ -1,5 +1,5 @@
 diff --git a/libs/oci-cfg-generators/src/linglong/oci-cfg-generators/container_cfg_builder.cpp b/libs/oci-cfg-generators/src/linglong/oci-cfg-generators/container_cfg_builder.cpp
-index 4e05fcba..454da25d 100644
+index 787e70cb..a71df46a 100644
 --- a/libs/oci-cfg-generators/src/linglong/oci-cfg-generators/container_cfg_builder.cpp
 +++ b/libs/oci-cfg-generators/src/linglong/oci-cfg-generators/container_cfg_builder.cpp
 @@ -19,6 +19,8 @@
@@ -11,7 +11,7 @@ index 4e05fcba..454da25d 100644
  
  #include <sys/stat.h>
  #include <sys/types.h>
-@@ -382,19 +384,43 @@ ContainerCfgBuilder &ContainerCfgBuilder::bindHostRoot() noexcept
+@@ -432,19 +434,67 @@ ContainerCfgBuilder &ContainerCfgBuilder::bindHostRoot() noexcept
  
  ContainerCfgBuilder &ContainerCfgBuilder::bindHostStatics() noexcept
  {
@@ -38,8 +38,10 @@ index 4e05fcba..454da25d 100644
 -        bindIfExist(*hostStaticsMount, loc);
 +    auto nixStorePaths = std::unordered_set<std::string>{};
 +    for (const auto &[source, destination] : statics) {
-+        if (!std::filesystem::exists(source))
++        if (!std::filesystem::exists(source)) {
++            std::cerr << "[bindHostStatics] Skipping non-existent path: " << source << std::endl;
 +            continue;
++        }
 +
 +        bindIfExist(*hostStaticsMount, source, destination);
 +
@@ -49,17 +51,39 @@ index 4e05fcba..454da25d 100644
 +        if (source.string().rfind(sourcePathPrefix, 0) != 0)
 +            continue;
 +
++        std::error_code ec;
 +        for (const std::filesystem::directory_entry &dir_entry :
-+             std::filesystem::recursive_directory_iterator(source)) {
-+            if (!dir_entry.is_symlink())
-+                continue;
++             std::filesystem::recursive_directory_iterator(source, std::filesystem::directory_options::skip_permission_denied, ec)) 
++        {
++            if (ec) {
++                std::cerr << "[bindHostStatics] Failed to iterate directory: " << source << ", error: " << ec.message() << std::endl;
++                break;
++            }
 +
-+            std::string target = std::filesystem::canonical(dir_entry.path());
++            if (!dir_entry.is_symlink(ec) || ec) {
++                if (ec)
++                    std::cerr << "[bindHostStatics] Failed to check symlink: " << dir_entry.path() << ", error: " << ec.message() << std::endl;
++                continue;
++            }
++
++            std::filesystem::path targetPath = std::filesystem::canonical(dir_entry.path(), ec);
++            if (ec) {
++                std::cerr << "[bindHostStatics] Failed to resolve symlink: " << dir_entry.path() << ", error: " << ec.message() << std::endl;
++                continue;
++            }
++
++            std::string target = targetPath.string();
 +            if (target.rfind(nixStorePrefix, 0) != 0)
 +                continue;
-+            nixStorePaths.insert(target.substr(0, target.find('/', nixStorePrefix.length())));
++
++            auto endPos = target.find('/', nixStorePrefix.length());
++            if (endPos != std::string::npos)
++                nixStorePaths.insert(target.substr(0, endPos));
++            else
++                nixStorePaths.insert(target);
 +        }
 +    }
++
 +    for (const std::string &path : nixStorePaths) {
 +        bindIfExist(*hostStaticsMount, path);
      }
