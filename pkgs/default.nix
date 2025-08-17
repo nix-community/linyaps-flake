@@ -64,6 +64,10 @@ stdenv.mkDerivation (finalAttrs: {
 
     substituteInPlace misc/share/applications/linyaps.desktop \
       --replace-fail "/usr/bin/ll-cli" "$out/bin/ll-cli"
+
+    # Don't use hardcoded paths in the application's desktop file, as it would become invalid when the old linyaps gets removed.
+    substituteInPlace libs/linglong/src/linglong/repo/ostree_repo.cpp \
+      --replace-fail 'LINGLONG_CLIENT_PATH' 'LINGLONG_CLIENT_NAME'
   '';
 
   buildInputs = [
