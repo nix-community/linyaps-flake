@@ -1,22 +1,12 @@
-# Linglong Flake
+# Linyaps Flake
 
-A Nix Flake project for deploying Linglong containers.
-
-## What is Linglong?
-
-Linglong is a cross-distribution package manager that supports sandboxed applications and shared runtime environments. It enables you to:
-
-- Run the same applications across different Linux distributions
-- Isolate application environments using sandbox technology
-- Share runtime libraries to reduce disk usage
-- Support OCI container standards
+A Nix Flake project for deploying linyaps containers.
 
 ## Quick Start
 
 ### 1. Build Packages
 
 ```bash
-# Build with default configuration
 nix build .#linyaps-box
 nix build .#linyaps
 ```
@@ -29,16 +19,16 @@ Include the nixos module in your configuration：
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    linglong-flake.url = "github:wineee/linglong-flake";
+    linyaps-flake.url = "github:wineee/linyaps-flake";
   };
 
-  outputs = { self, nixpkgs, linglong-flake, ... }: {
+  outputs = { self, nixpkgs, linyaps-flake, ... }: {
     nixosConfigurations = {
       my-nixos = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           ./configuration.nix
-          linglong-flake.nixosModules.linyaps
+          linyaps-flake.nixosModules.linyaps
           {
             services.linyaps.enable = true;
           }

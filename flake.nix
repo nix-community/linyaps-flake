@@ -62,7 +62,6 @@
                   linyaps-box
                 ];
 
-                # 添加/etc配置文件
                 etc = {
                   "profile.d/linglong.sh" = {
                     source = "${linyaps}/etc/profile.d/linglong.sh";
