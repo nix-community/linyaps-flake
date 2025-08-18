@@ -80,16 +80,6 @@
                   isSystemUser = true;
                 };
               };
-
-              # 添加polkit规则
-              security.polkit.extraConfig = ''
-                polkit.addRule(function(action, subject) {
-                  if (action.id == "org.deepin.linglong.PackageManager1.install" &&
-                      subject.local && subject.active && subject.isInGroup("deepin-linglong")) {
-                    return polkit.Result.YES;
-                  }
-                });
-              '';
             };
           };
       };
