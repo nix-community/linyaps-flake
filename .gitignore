@@ -4,3 +4,4 @@ source
 outputs
 vm/flake.lock
 vm/nixos.qcow2
+.aider*
