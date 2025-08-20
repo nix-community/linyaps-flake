@@ -19,7 +19,7 @@ Include the nixos module in your configuration：
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    linyaps-flake.url = "github:wineee/linyaps-flake";
+    linyaps-flake.url = "github:nix-community/linyaps-flake";
   };
 
   outputs = { self, nixpkgs, linyaps-flake, ... }: {
