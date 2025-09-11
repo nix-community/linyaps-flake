@@ -39,28 +39,23 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "linyaps";
-  version = "1.9.8";
+  version = "1.9.10";
 
   src = fetchFromGitHub {
     owner = "OpenAtom-Linyaps";
     repo = finalAttrs.pname;
     tag = finalAttrs.version;
-    hash = "sha256-GOgjL6I33HA4BYBc/oXwXPgEk0w360eM+BSKddpwAxg=";
+    hash = "sha256-wvmN70AluT10zcrSsthErgbNvdYYlxlf0zkIfi/9E18=";
   };
 
   patches = [
-    (fetchpatch {
-      name = "use-CMAKE_INSTALL_SYSCONFDIR-for-config-paths.patch";
-      url = "https://github.com/OpenAtom-Linyaps/linyaps/commit/b0a2a1d873e6416feb3ddea13800aa1eba62c2ff.patch";
-      hash = "sha256-0VtMyatpr//xA9je4B/4ZBj46uzqLtzsDmJAyPTnPQ8=";
-    })
     ./fix-host-path.patch
   ];
 
   postPatch = ''
-    substituteInPlace apps/dumb-init/CMakeLists.txt \
-      --replace-fail "target_link_options(\''${DUMB_INIT_TARGET} PRIVATE -static)" \
-                     "target_link_options(\''${DUMB_INIT_TARGET} PRIVATE -static -L${stdenv.cc.libc.static}/lib)"
+    substituteInPlace apps/ll-init/CMakeLists.txt \
+      --replace-fail "target_link_options(\''${LL_INIT_TARGET} PRIVATE -static -static-libgcc" \
+                     "target_link_options(\''${LL_INIT_TARGET} PRIVATE -static -static-libgcc -L${stdenv.cc.libc.static}/lib"
 
     substituteInPlace misc/share/applications/linyaps.desktop \
       --replace-fail "/usr/bin/ll-cli" "$out/bin/ll-cli"
@@ -130,7 +125,7 @@ stdenv.mkDerivation (finalAttrs: {
     # Wrap all executables except dumb-init
     find "$out" -type f -executable \
       \( -path "$out/bin/*" -o -path "$out/libexec/*" \) \
-      ! -name "dumb-init" \
+      ! -name "ll-init" \
       -print0 | while IFS= read -r -d "" f; do
       wrapQtApp "$f"
     done
