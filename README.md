@@ -2,6 +2,8 @@
 
 A Nix Flake project for deploying linyaps containers.
 
+[Since NixOS 25.11, Linyaps has been merged into upstream](https://github.com/NixOS/nixpkgs/pull/442883)
+
 ## Quick Start
 
 ### 1. Build Packages
