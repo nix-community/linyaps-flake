@@ -2,7 +2,7 @@
 
 A Nix Flake project for deploying linyaps containers.
 
-[Since NixOS 25.11, Linyaps has been merged into upstream](https://github.com/NixOS/nixpkgs/pull/442883)
+[Since NixOS 25.11, Linyaps and linyaps-box has been merged into upstream](https://github.com/NixOS/nixpkgs/pull/442883)
 
 ## Quick Start
 
@@ -30,10 +30,6 @@ Include the nixos module in your configuration：
         system = "x86_64-linux";
         modules = [
           ./configuration.nix
-          linyaps-flake.nixosModules.linyaps
-          {
-            services.linyaps.enable = true;
-          }
         ];
       };
     };
